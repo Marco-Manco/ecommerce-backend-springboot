@@ -21,6 +21,6 @@ public interface VarianteProductoRepository extends JpaRepository<VarianteProduc
     @Query("SELECT v FROM VarianteProducto v WHERE v.id = :id")
     Optional<VarianteProducto> findByIdWithLock(@Param("id") Long id);
 
-    @Query("SELECT v FROM VarianteProducto v WHERE v.stock - v.stockReservado <= umbral")
+    @Query("SELECT v FROM VarianteProducto v WHERE v.stock - v.stockReservado <= :umbral")
     List<VarianteProducto> findStockBajo(@Param("umbral") int umbral);
 }
