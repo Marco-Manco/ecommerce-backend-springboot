@@ -17,6 +17,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ProductoMapper {
     @Mapping(target = "stockDisponible", expression = "java(v.getStockDisponible())")
+    @Mapping(target = "talle", source = "tamanio")
     VarianteDTO varianteToDTO(VarianteProducto v);
 
     List<VarianteDTO> variantesToDTO(List<VarianteProducto> variantes);

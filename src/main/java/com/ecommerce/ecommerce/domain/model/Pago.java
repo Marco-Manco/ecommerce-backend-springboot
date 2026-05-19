@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -29,7 +31,8 @@ public class Pago {
     private String mercadopagoPaymentId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "estado_pago")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(nullable = false)
     private EstadoPago estado = EstadoPago.PENDIENTE;
 
     @Column(nullable = false, precision = 12, scale = 2)

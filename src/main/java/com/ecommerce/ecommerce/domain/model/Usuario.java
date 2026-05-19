@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,7 +39,8 @@ public class Usuario {
     private String oauth2ProviderId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "rol_usuario")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(nullable = false)
     private Rol rol = Rol.CLIENTE;
 
     @Column(nullable = false)
