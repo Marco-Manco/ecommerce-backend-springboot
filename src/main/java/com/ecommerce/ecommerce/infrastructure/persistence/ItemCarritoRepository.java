@@ -15,5 +15,5 @@ public interface ItemCarritoRepository extends JpaRepository<ItemCarrito, Long> 
 
     @Modifying
     @Query("DELETE FROM ItemCarrito ic WHERE ic.carrito.id = :carritoId")
-    void deleteAllbyCarritoId(@Param("carritoId") Long carritoId);
+    void deleteAllByCarritoId(@Param("carritoId") Long carritoId);
 }
