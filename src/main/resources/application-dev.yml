@@ -33,3 +33,6 @@ app:
   jwt:
     secret: ${JWT_SECRET}
     expiration-ms: ${JWT_EXPIRATION_MS:3600000}
+
+mercado-pago:
+  access-token: ${MP_ACCESS_TOKEN}

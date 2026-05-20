@@ -7,7 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -44,6 +46,7 @@ public class Pago {
     @Column(name = "fecha_actualizacion")
     private LocalDateTime fechaActualizacion;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "raw_response", columnDefinition = "JSONB")
     private String rawResponse;
 }

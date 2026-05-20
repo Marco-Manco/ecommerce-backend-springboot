@@ -17,7 +17,15 @@ public interface PedidoMapper {
     @Mapping(target = "estado", expression = "java(pedido.getEstado().name())")
     @Mapping(target = "metodoPago", expression = "java(pedido.getMetodoPago().name())")
     @Mapping(target = "items", source = "items")
+    @Mapping(target = "linkPago", ignore = true)
     PedidoDTO toDTO(Pedido pedido);
+
+    default PedidoDTO toDTO(Pedido pedido, String linkPago) {
+        PedidoDTO base = toDTO(pedido);
+        return new PedidoDTO(base.id(), base.numeroPedido(), base.estado(),
+                base.subtotal(), base.costoEnvio(), base.total(), base.metodoPago(),
+                base.fechaCreacion(), base.fechaExpiracionReserva(), base.items(), linkPago);
+    }
 
     ItemPedidoDTO itemToDTO(ItemPedido item);
 

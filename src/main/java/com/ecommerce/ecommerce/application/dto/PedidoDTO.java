@@ -35,5 +35,8 @@ public record PedidoDTO(
     LocalDateTime fechaExpiracionReserva,
 
     @Schema(description = "Items del pedido")
-    List<ItemPedidoDTO> items
+    List<ItemPedidoDTO> items,
+
+    @Schema(description = "Link de pago de MercadoPago", example = "https://www.mercadopago.com.ar/checkout/v1/...")
+    String linkPago
 ) {}

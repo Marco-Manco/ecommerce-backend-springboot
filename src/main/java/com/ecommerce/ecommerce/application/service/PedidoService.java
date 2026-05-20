@@ -6,9 +6,12 @@ import com.ecommerce.ecommerce.application.mapper.PedidoMapper;
 import com.ecommerce.ecommerce.application.port.out.BuscarUsuarioPort;
 import com.ecommerce.ecommerce.application.port.out.GestionarCarritoPort;
 import com.ecommerce.ecommerce.application.port.out.GestionarProductoPort;
+import com.ecommerce.ecommerce.application.port.out.PagoPort;
+import com.ecommerce.ecommerce.domain.enums.EstadoPago;
 import com.ecommerce.ecommerce.domain.enums.EstadoPedido;
 import com.ecommerce.ecommerce.domain.exception.StockInsuficienteException;
 import com.ecommerce.ecommerce.domain.model.*;
+import com.ecommerce.ecommerce.infrastructure.persistence.PagoRepository;
 import com.ecommerce.ecommerce.infrastructure.persistence.PedidoRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,32 +19,36 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Transactional
 public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
+    private final PagoRepository pagoRepository;
     private final BuscarUsuarioPort buscarUsuarioPort;
     private final GestionarCarritoPort gestionarCarritoPort;
     private final GestionarProductoPort gestionarProductoPort;
+    private final PagoPort pagoPort;
     private final PedidoMapper pedidoMapper;
 
-    private final AtomicInteger contadorPedidos = new AtomicInteger(1);
-
     public PedidoService(PedidoRepository pedidoRepository,
+                         PagoRepository pagoRepository,
                          BuscarUsuarioPort buscarUsuarioPort,
                          GestionarCarritoPort gestionarCarritoPort,
                          GestionarProductoPort gestionarProductoPort,
+                         PagoPort pagoPort,
                          PedidoMapper pedidoMapper) {
         this.pedidoRepository = pedidoRepository;
+        this.pagoRepository = pagoRepository;
         this.buscarUsuarioPort = buscarUsuarioPort;
         this.gestionarCarritoPort = gestionarCarritoPort;
         this.gestionarProductoPort = gestionarProductoPort;
+        this.pagoPort = pagoPort;
         this.pedidoMapper = pedidoMapper;
     }
 
@@ -52,7 +59,8 @@ public class PedidoService {
         Pedido pedido = crearPedidoConItems(carrito, direccion);
         pedidoRepository.save(pedido);
         gestionarCarritoPort.vaciar(email);
-        return pedidoMapper.toDTO(pedido);
+        String linkPago = pagoPort.generarLinkPago(pedido);
+        return pedidoMapper.toDTO(pedido, linkPago);
     }
 
     @Transactional(readOnly = true)
@@ -73,6 +81,37 @@ public class PedidoService {
         }
 
         return pedidoMapper.toDTO(pedido);
+    }
+
+    public void confirmarPago(Long pedidoId) {
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Pedido", pedidoId));
+        ejecutarConfirmacionPago(pedido);
+    }
+
+    private void ejecutarConfirmacionPago(Pedido pedido) {
+
+        if (pedido.getEstado() != EstadoPedido.PENDIENTE) {
+            return;
+        }
+
+        for (ItemPedido item : pedido.getItems()) {
+            VarianteProducto variante = item.getVarianteProducto();
+            if (variante != null) {
+                variante.setStock(variante.getStock() - item.getCantidad());
+                variante.setStockReservado(variante.getStockReservado() - item.getCantidad());
+            }
+        }
+
+        pedido.setEstado(EstadoPedido.PAGADO);
+        pedido.setFechaPago(LocalDateTime.now());
+
+        Pago pago = new Pago();
+        pago.setPedido(pedido);
+        pago.setMonto(pedido.getTotal());
+        pago.setEstado(EstadoPago.APROBADO);
+        pago.setFechaActualizacion(LocalDateTime.now());
+        pagoRepository.save(pago);
     }
 
     public void cancelarPedidosExpirados(List<Pedido> expirados) {
@@ -144,7 +183,9 @@ public class PedidoService {
 
     private String generarNumeroPedido() {
         String fecha = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        int secuencia = contadorPedidos.getAndIncrement();
+        LocalDateTime inicioDelDia = LocalDate.now().atStartOfDay();
+        long count = pedidoRepository.countByFechaCreacionAfter(inicioDelDia);
+        int secuencia = (int) count + 1;
         return String.format("ORD-%s-%03d", fecha, secuencia);
     }
 }
