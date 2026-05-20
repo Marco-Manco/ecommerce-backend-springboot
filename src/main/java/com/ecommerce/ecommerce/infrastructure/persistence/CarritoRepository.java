@@ -12,6 +12,6 @@ import java.util.Optional;
 public interface CarritoRepository extends JpaRepository<Carrito, Long> {
     Optional<Carrito> findByUsuarioId(Long usuarioId);
 
-    @Query("SELECT c FROM Carrito c JOIN FETCH c.items i JOIN FETCH i.varianteProducto WHERE c.usuario.id = :usuarioId")
+    @Query("SELECT c FROM Carrito c LEFT JOIN FETCH c.items i LEFT JOIN FETCH i.varianteProducto WHERE c.usuario.id = :usuarioId")
     Optional<Carrito> findByUsuarioIdWithItems(@Param("usuarioId") Long usuarioId);
 }

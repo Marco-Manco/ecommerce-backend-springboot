@@ -4,6 +4,7 @@ import com.ecommerce.ecommerce.application.dto.AgregarItemCarritoDTO;
 import com.ecommerce.ecommerce.application.dto.CarritoDTO;
 import com.ecommerce.ecommerce.application.mapper.CarritoMapper;
 import com.ecommerce.ecommerce.application.port.out.BuscarUsuarioPort;
+import com.ecommerce.ecommerce.application.port.out.GestionarCarritoPort;
 import com.ecommerce.ecommerce.application.port.out.GestionarProductoPort;
 import com.ecommerce.ecommerce.domain.exception.StockInsuficienteException;
 import com.ecommerce.ecommerce.domain.model.Carrito;
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
 
 @Service
 @Transactional
-public class CarritoService {
+public class CarritoService implements GestionarCarritoPort {
 
     private final CarritoRepository carritoRepository;
     private final ItemCarritoRepository itemCarritoRepository;
@@ -39,7 +40,6 @@ public class CarritoService {
         this.carritoMapper = carritoMapper;
     }
 
-    @Transactional(readOnly = true)
     public CarritoDTO obtenerCarrito(String email) {
         Usuario usuario = buscarUsuarioPort.buscarPorEmail(email);
         Carrito carrito = carritoRepository.findByUsuarioIdWithItems(usuario.getId())
@@ -105,6 +105,18 @@ public class CarritoService {
         Carrito carrito = carritoRepository.findByUsuarioId(usuario.getId())
                 .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
         itemCarritoRepository.deleteAllByCarritoId(carrito.getId());
+    }
+
+    @Override
+    public Carrito obtenerCarritoConItems(String email) {
+        Usuario usuario = buscarUsuarioPort.buscarPorEmail(email);
+        return carritoRepository.findByUsuarioIdWithItems(usuario.getId())
+                .orElseGet(() -> crearCarritoVacio(usuario));
+    }
+
+    @Override
+    public void vaciar(String email) {
+        vaciarCarrito(email);
     }
 
     private ItemCarrito obtenerYValidarPertenencia(String email, Long itemId) {

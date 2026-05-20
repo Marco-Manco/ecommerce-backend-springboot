@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -62,5 +63,17 @@ public class ProductoService implements GestionarProductoPort {
     @Override
     public Optional<Producto> buscarProductoConVariantesEImagenes(Long productoId) {
         return productoRepository.findByIdWithVariantesAndImagenes(productoId);
+    }
+
+    @Override
+    @Transactional
+    public VarianteProducto lockearVariante(Long varianteId) {
+        return varianteProductoRepository.findByIdWithLock(varianteId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Variante", varianteId));
+    }
+
+    @Override
+    public List<VarianteProducto> buscarStockBajo(int umbral) {
+        return varianteProductoRepository.findStockBajo(umbral);
     }
 }

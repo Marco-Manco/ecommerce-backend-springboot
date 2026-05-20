@@ -36,7 +36,7 @@ public class Producto {
 
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
     @Setter(lombok.AccessLevel.NONE)
-    private List<ImagenProducto> imagenes = new ArrayList<>();
+    private java.util.Set<ImagenProducto> imagenes = new java.util.LinkedHashSet<>();
 
     @Column(nullable = false)
     private Boolean activo = true;

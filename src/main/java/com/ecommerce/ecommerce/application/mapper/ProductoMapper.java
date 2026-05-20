@@ -13,6 +13,7 @@ import org.mapstruct.Mapping;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 @Mapper(componentModel = "spring")
 public interface ProductoMapper {
@@ -24,7 +25,7 @@ public interface ProductoMapper {
 
     ImagenDTO imagenToDTO(ImagenProducto imagen);
 
-    List<ImagenDTO> imagenesToDTO(List<ImagenProducto> imagenes);
+    List<ImagenDTO> imagenesToDTO(Set<ImagenProducto> imagenes);
 
     @Mapping(target = "categoria", source = "categoria.nombre")
     @Mapping(target = "precioDesde", expression = "java(precioMinimo(producto))")

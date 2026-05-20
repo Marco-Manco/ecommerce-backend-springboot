@@ -16,7 +16,7 @@ import java.util.Optional;
 public interface ProductoRepository extends JpaRepository<Producto, Long>, JpaSpecificationExecutor<Producto> {
     Page<Producto> findByActivoTrue(Pageable pageable);
 
-    @Query("SELECT p FROM Producto p JOIN FETCH p.variantes JOIN FETCH p.imagenes WHERE p.id = :id")
+    @Query("SELECT DISTINCT p FROM Producto p LEFT JOIN FETCH p.variantes LEFT JOIN FETCH p.imagenes WHERE p.id = :id")
     Optional<Producto> findByIdWithVariantesAndImagenes(@Param("id") Long id);
 
     @Query("SELECT DISTINCT p FROM Producto p JOIN FETCH p.variantes WHERE p.activo = true")
