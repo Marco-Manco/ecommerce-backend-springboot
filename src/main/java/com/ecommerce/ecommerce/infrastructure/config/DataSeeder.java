@@ -136,5 +136,14 @@ public class DataSeeder implements CommandLineRunner {
         dir2.setProvincia("CABA");
         dir2.setCodigoPostal("C1043");
         direccionRepository.save(dir2);
+
+        if (usuarioRepository.existsByEmail("admin@test.com")) return;
+
+        Usuario admin = new Usuario();
+        admin.setEmail("admin@test.com");
+        admin.setNombre("Admin Principal");
+        admin.setPasswordHash(passwordEncoder.encode("admin1234"));
+        admin.setRol(Rol.ADMIN);
+        usuarioRepository.save(admin);
     }
 }

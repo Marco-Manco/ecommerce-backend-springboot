@@ -1,18 +1,12 @@
 {
   "info": {
     "name": "Ecommerce Tejidos API",
-    "description": "Endpoints completos del ecommerce.\n\n1️⃣ Ejecutar POST /auth/login con las creds de prueba (cliente@test.com / test1234) para guardar el JWT automáticamente en la variable {{jwt_token}}.\n\n2️⃣ Los demás endpoints usan {{jwt_token}} en el header Authorization.",
+    "description": "Endpoints completos del ecommerce.\n\n1️⃣ Ejecutar Login Cliente o Login Admin para guardar el JWT en {{jwt_token}}.\n\n2️⃣ Los demás endpoints usan {{jwt_token}} en Authorization.\n\nCredenciales de prueba:\n- Cliente: cliente@test.com / test1234\n- Admin: admin@test.com / admin1234",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    {
-      "key": "base_url",
-      "value": "http://localhost:8080"
-    },
-    {
-      "key": "jwt_token",
-      "value": ""
-    }
+    { "key": "base_url", "value": "http://localhost:8080" },
+    { "key": "jwt_token", "value": "" }
   ],
   "item": [
     {
@@ -20,63 +14,32 @@
       "item": [
         {
           "name": "Registrar usuario",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "var resp = pm.response.json();",
-                  "if (resp.token) {",
-                  "    pm.collectionVariables.set('jwt_token', resp.token);",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
+          "event": [{ "listen": "test", "script": { "exec": ["var resp = pm.response.json();", "if (resp.token) { pm.collectionVariables.set('jwt_token', resp.token); }"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Nuevo Usuario\",\n  \"email\": \"nuevo@test.com\",\n  \"password\": \"test1234\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/auth/register",
-              "host": ["{{base_url}}"],
-              "path": ["api", "auth", "register"]
-            }
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Nuevo\",\n  \"email\": \"nuevo@test.com\",\n  \"password\": \"test1234\"\n}" },
+            "url": { "raw": "{{base_url}}/api/auth/register", "host": ["{{base_url}}"], "path": ["api", "auth", "register"] }
           }
         },
         {
-          "name": "Login (usuario de prueba)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "var resp = pm.response.json();",
-                  "if (resp.token) {",
-                  "    pm.collectionVariables.set('jwt_token', resp.token);",
-                  "    console.log('JWT guardado: ' + resp.token.substring(0, 20) + '...');",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
+          "name": "Login Cliente",
+          "event": [{ "listen": "test", "script": { "exec": ["var resp = pm.response.json();", "if (resp.token) { pm.collectionVariables.set('jwt_token', resp.token); console.log('JWT guardado'); }"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"cliente@test.com\",\n  \"password\": \"test1234\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/auth/login",
-              "host": ["{{base_url}}"],
-              "path": ["api", "auth", "login"]
-            }
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"cliente@test.com\",\n  \"password\": \"test1234\"\n}" },
+            "url": { "raw": "{{base_url}}/api/auth/login", "host": ["{{base_url}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Login Admin",
+          "event": [{ "listen": "test", "script": { "exec": ["var resp = pm.response.json();", "if (resp.token) { pm.collectionVariables.set('jwt_token', resp.token); console.log('JWT Admin guardado'); }"], "type": "text/javascript" } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@test.com\",\n  \"password\": \"admin1234\"\n}" },
+            "url": { "raw": "{{base_url}}/api/auth/login", "host": ["{{base_url}}"], "path": ["api", "auth", "login"] }
           }
         }
       ]
@@ -86,302 +49,85 @@
       "item": [
         {
           "name": "Listar categorías (árbol)",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/categorias",
-              "host": ["{{base_url}}"],
-              "path": ["api", "categorias"]
-            }
-          }
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/categorias", "host": ["{{base_url}}"], "path": ["api", "categorias"] } }
         },
         {
-          "name": "Listar productos (con paginación)",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/productos?page=0&size=10&sort=nombre,asc",
-              "host": ["{{base_url}}"],
-              "path": ["api", "productos"],
-              "query": [
-                {"key": "page", "value": "0"},
-                {"key": "size", "value": "10"},
-                {"key": "sort", "value": "nombre,asc"}
-              ]
-            }
-          }
+          "name": "Listar productos (paginación)",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/productos?page=0&size=10&sort=nombre,asc", "host": ["{{base_url}}"], "path": ["api", "productos"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "10" }, { "key": "sort", "value": "nombre,asc" }] } }
         },
         {
-          "name": "Listar productos (filtrar por nombre)",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/productos?nombre=bufanda&page=0&size=10",
-              "host": ["{{base_url}}"],
-              "path": ["api", "productos"],
-              "query": [
-                {"key": "nombre", "value": "bufanda"},
-                {"key": "page", "value": "0"},
-                {"key": "size", "value": "10"}
-              ]
-            }
-          }
+          "name": "Filtrar por nombre",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/productos?nombre=bufanda&page=0&size=10", "host": ["{{base_url}}"], "path": ["api", "productos"], "query": [{ "key": "nombre", "value": "bufanda" }, { "key": "page", "value": "0" }, { "key": "size", "value": "10" }] } }
         },
         {
-          "name": "Listar productos (filtrar por categoría)",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/productos?categoriaId=1&page=0&size=10",
-              "host": ["{{base_url}}"],
-              "path": ["api", "productos"],
-              "query": [
-                {"key": "categoriaId", "value": "1"},
-                {"key": "page", "value": "0"},
-                {"key": "size", "value": "10"}
-              ]
-            }
-          }
+          "name": "Filtrar por categoría",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/productos?categoriaId=1&page=0&size=10", "host": ["{{base_url}}"], "path": ["api", "productos"], "query": [{ "key": "categoriaId", "value": "1" }, { "key": "page", "value": "0" }, { "key": "size", "value": "10" }] } }
         },
         {
-          "name": "Listar productos (rango de precio)",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/productos?precioMin=1000&precioMax=2000&page=0&size=10",
-              "host": ["{{base_url}}"],
-              "path": ["api", "productos"],
-              "query": [
-                {"key": "precioMin", "value": "1000"},
-                {"key": "precioMax", "value": "2000"},
-                {"key": "page", "value": "0"},
-                {"key": "size", "value": "10"}
-              ]
-            }
-          }
+          "name": "Filtrar por rango de precio",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/productos?precioMin=1000&precioMax=2000&page=0&size=10", "host": ["{{base_url}}"], "path": ["api", "productos"], "query": [{ "key": "precioMin", "value": "1000" }, { "key": "precioMax", "value": "2000" }, { "key": "page", "value": "0" }, { "key": "size", "value": "10" }] } }
         },
         {
-          "name": "Detalle de producto (con variantes e imágenes)",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/productos/1",
-              "host": ["{{base_url}}"],
-              "path": ["api", "productos", "1"]
-            }
-          }
+          "name": "Detalle de producto",
+          "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/productos/1", "host": ["{{base_url}}"], "path": ["api", "productos", "1"] } }
         }
       ]
     },
     {
-      "name": "🔒 Carrito (requiere JWT)",
+      "name": "🔒 Carrito (CLIENTE)",
       "item": [
-        {
-          "name": "Obtener carrito",
-          "request": {
-            "method": "GET",
-            "header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
-            "url": {
-              "raw": "{{base_url}}/api/carrito",
-              "host": ["{{base_url}}"],
-              "path": ["api", "carrito"]
-            }
-          }
-        },
-        {
-          "name": "Agregar item al carrito",
-          "request": {
-            "method": "POST",
-            "header": [
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{jwt_token}}"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"varianteProductoId\": 1,\n  \"cantidad\": 2\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/carrito/items",
-              "host": ["{{base_url}}"],
-              "path": ["api", "carrito", "items"]
-            }
-          }
-        },
-        {
-          "name": "Agregar otro item (bufanda azul L)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{jwt_token}}"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"varianteProductoId\": 4,\n  \"cantidad\": 1\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/carrito/items",
-              "host": ["{{base_url}}"],
-              "path": ["api", "carrito", "items"]
-            }
-          }
-        },
-        {
-          "name": "Agregar osito tejido",
-          "request": {
-            "method": "POST",
-            "header": [
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{jwt_token}}"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"varianteProductoId\": 11,\n  \"cantidad\": 1\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/carrito/items",
-              "host": ["{{base_url}}"],
-              "path": ["api", "carrito", "items"]
-            }
-          }
-        },
-        {
-          "name": "Actualizar cantidad de item",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {"key": "Authorization", "value": "Bearer {{jwt_token}}"}
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/carrito/items/1?cantidad=3",
-              "host": ["{{base_url}}"],
-              "path": ["api", "carrito", "items", "1"],
-              "query": [{"key": "cantidad", "value": "3"}]
-            }
-          }
-        },
-        {
-          "name": "Eliminar item del carrito",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {"key": "Authorization", "value": "Bearer {{jwt_token}}"}
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/carrito/items/1",
-              "host": ["{{base_url}}"],
-              "path": ["api", "carrito", "items", "1"]
-            }
-          }
-        },
-        {
-          "name": "Vaciar carrito",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {"key": "Authorization", "value": "Bearer {{jwt_token}}"}
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/carrito",
-              "host": ["{{base_url}}"],
-              "path": ["api", "carrito"]
-            }
-          }
-        }
+        { "name": "Obtener carrito", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "url": { "raw": "{{base_url}}/api/carrito", "host": ["{{base_url}}"], "path": ["api", "carrito"] } } },
+        { "name": "Agregar item (bufanda roja M)", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "body": { "mode": "raw", "raw": "{\n  \"varianteProductoId\": 1,\n  \"cantidad\": 2\n}" }, "url": { "raw": "{{base_url}}/api/carrito/items", "host": ["{{base_url}}"], "path": ["api", "carrito", "items"] } } },
+        { "name": "Agregar item (bufanda azul L)", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "body": { "mode": "raw", "raw": "{\n  \"varianteProductoId\": 4,\n  \"cantidad\": 1\n}" }, "url": { "raw": "{{base_url}}/api/carrito/items", "host": ["{{base_url}}"], "path": ["api", "carrito", "items"] } } },
+        { "name": "Actualizar cantidad", "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "url": { "raw": "{{base_url}}/api/carrito/items/1?cantidad=3", "host": ["{{base_url}}"], "path": ["api", "carrito", "items", "1"], "query": [{ "key": "cantidad", "value": "3" }] } } },
+        { "name": "Eliminar item", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "url": { "raw": "{{base_url}}/api/carrito/items/1", "host": ["{{base_url}}"], "path": ["api", "carrito", "items", "1"] } } },
+        { "name": "Vaciar carrito", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "url": { "raw": "{{base_url}}/api/carrito", "host": ["{{base_url}}"], "path": ["api", "carrito"] } } }
       ]
     },
     {
-      "name": "🔒 Checkout y Pedidos (requiere JWT)",
+      "name": "🔒 Checkout y Pedidos (CLIENTE)",
       "item": [
-        {
-          "name": "Checkout (crear pedido desde carrito)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {"key": "Content-Type", "value": "application/json"},
-              {"key": "Authorization", "value": "Bearer {{jwt_token}}"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"direccionEnvioId\": 1\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/checkout",
-              "host": ["{{base_url}}"],
-              "path": ["api", "checkout"]
-            }
-          }
-        },
-        {
-          "name": "Listar mis pedidos",
-          "request": {
-            "method": "GET",
-            "header": [
-              {"key": "Authorization", "value": "Bearer {{jwt_token}}"}
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/pedidos?page=0&size=10",
-              "host": ["{{base_url}}"],
-              "path": ["api", "pedidos"],
-              "query": [
-                {"key": "page", "value": "0"},
-                {"key": "size", "value": "10"}
-              ]
-            }
-          }
-        },
-        {
-          "name": "Detalle de pedido",
-          "request": {
-            "method": "GET",
-            "header": [
-              {"key": "Authorization", "value": "Bearer {{jwt_token}}"}
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/pedidos/1",
-              "host": ["{{base_url}}"],
-              "path": ["api", "pedidos", "1"]
-            }
-          }
-        }
+        { "name": "Checkout (crear pedido)", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "body": { "mode": "raw", "raw": "{\n  \"direccionEnvioId\": 1\n}" }, "url": { "raw": "{{base_url}}/api/checkout", "host": ["{{base_url}}"], "path": ["api", "checkout"] } } },
+        { "name": "Listar mis pedidos", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "url": { "raw": "{{base_url}}/api/pedidos?page=0&size=10", "host": ["{{base_url}}"], "path": ["api", "pedidos"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "10" }] } } },
+        { "name": "Detalle de pedido", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "url": { "raw": "{{base_url}}/api/pedidos/1", "host": ["{{base_url}}"], "path": ["api", "pedidos", "1"] } } }
+      ]
+    },
+    {
+      "name": "💳 Pagos",
+      "item": [
+        { "name": "Confirmar pago manual", "request": { "method": "GET", "url": { "raw": "{{base_url}}/api/pagos/confirmar?pedidoId=1", "host": ["{{base_url}}"], "path": ["api", "pagos", "confirmar"], "query": [{ "key": "pedidoId", "value": "1" }] } } }
+      ]
+    },
+    {
+      "name": "🔒 Admin - Productos (ADMIN)",
+      "item": [
+        { "name": "Crear producto", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Nuevo Producto\",\n  \"descripcion\": \"Descripción del producto\",\n  \"categoriaId\": 1\n}" }, "url": { "raw": "{{base_url}}/api/admin/productos", "host": ["{{base_url}}"], "path": ["api", "admin", "productos"] } } },
+        { "name": "Actualizar producto", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Producto Actualizado\",\n  \"descripcion\": \"Nueva desc\",\n  \"activo\": true\n}" }, "url": { "raw": "{{base_url}}/api/admin/productos/1", "host": ["{{base_url}}"], "path": ["api", "admin", "productos", "1"] } } },
+        { "name": "Agregar variante", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "body": { "mode": "raw", "raw": "{\n  \"sku\": \"SKU-NUEVO-001\",\n  \"color\": \"Verde\",\n  \"talle\": \"M\",\n  \"precio\": 1200.00,\n  \"stock\": 10\n}" }, "url": { "raw": "{{base_url}}/api/admin/productos/1/variantes", "host": ["{{base_url}}"], "path": ["api", "admin", "productos", "1", "variantes"] } } },
+        { "name": "Actualizar variante", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "body": { "mode": "raw", "raw": "{\n  \"precio\": 1500.00,\n  \"stock\": 20,\n  \"color\": \"Azul\"\n}" }, "url": { "raw": "{{base_url}}/api/admin/variantes/1", "host": ["{{base_url}}"], "path": ["api", "admin", "variantes", "1"] } } }
+      ]
+    },
+    {
+      "name": "🔒 Admin - Categorías (ADMIN)",
+      "item": [
+        { "name": "Listar todas", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "url": { "raw": "{{base_url}}/api/admin/categorias", "host": ["{{base_url}}"], "path": ["api", "admin", "categorias"] } } },
+        { "name": "Crear categoría", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Ropa de Costura\",\n  \"descripcion\": \"Prendas confeccionadas a máquina\",\n  \"categoriaPadreId\": null\n}" }, "url": { "raw": "{{base_url}}/api/admin/categorias", "host": ["{{base_url}}"], "path": ["api", "admin", "categorias"] } } },
+        { "name": "Actualizar categoría", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Nombre Actualizado\",\n  \"activo\": true\n}" }, "url": { "raw": "{{base_url}}/api/admin/categorias/1", "host": ["{{base_url}}"], "path": ["api", "admin", "categorias", "1"] } } }
+      ]
+    },
+    {
+      "name": "🔒 Admin - Pedidos (ADMIN)",
+      "item": [
+        { "name": "Listar todos", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "url": { "raw": "{{base_url}}/api/admin/pedidos?page=0&size=10", "host": ["{{base_url}}"], "path": ["api", "admin", "pedidos"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "10" }] } } },
+        { "name": "Cambiar estado (EN_PREPARACION)", "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "body": { "mode": "raw", "raw": "{\n  \"estado\": \"EN_PREPARACION\"\n}" }, "url": { "raw": "{{base_url}}/api/admin/pedidos/1/estado", "host": ["{{base_url}}"], "path": ["api", "admin", "pedidos", "1", "estado"] } } },
+        { "name": "Cambiar estado (ENVIADO)", "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{jwt_token}}" }], "body": { "mode": "raw", "raw": "{\n  \"estado\": \"ENVIADO\"\n}" }, "url": { "raw": "{{base_url}}/api/admin/pedidos/1/estado", "host": ["{{base_url}}"], "path": ["api", "admin", "pedidos", "1", "estado"] } } }
       ]
     },
     {
       "name": "📖 Swagger / Actuator",
       "item": [
-        {
-          "name": "Swagger UI",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/swagger-ui.html",
-              "host": ["{{base_url}}"],
-              "path": ["swagger-ui.html"]
-            }
-          }
-        },
-        {
-          "name": "API Docs (JSON)",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/v3/api-docs",
-              "host": ["{{base_url}}"],
-              "path": ["v3/api-docs"]
-            }
-          }
-        },
-        {
-          "name": "Health Check",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/actuator/health",
-              "host": ["{{base_url}}"],
-              "path": ["actuator", "health"]
-            }
-          }
-        }
+        { "name": "Swagger UI", "request": { "method": "GET", "url": { "raw": "{{base_url}}/swagger-ui.html", "host": ["{{base_url}}"], "path": ["swagger-ui.html"] } } },
+        { "name": "Health Check", "request": { "method": "GET", "url": { "raw": "{{base_url}}/actuator/health", "host": ["{{base_url}}"], "path": ["actuator", "health"] } } }
       ]
     }
   ]
