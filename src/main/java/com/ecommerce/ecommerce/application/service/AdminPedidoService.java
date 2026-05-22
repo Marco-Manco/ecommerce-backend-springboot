@@ -9,10 +9,13 @@ import com.ecommerce.ecommerce.domain.model.ItemPedido;
 import com.ecommerce.ecommerce.domain.model.Pedido;
 import com.ecommerce.ecommerce.domain.model.VarianteProducto;
 import com.ecommerce.ecommerce.infrastructure.persistence.PedidoRepository;
+import com.ecommerce.ecommerce.infrastructure.persistence.specification.PedidoSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 
 @Service
 @Transactional
@@ -28,8 +31,9 @@ public class AdminPedidoService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PedidoDTO> listarTodos(Pageable pageable) {
-        return pedidoRepository.findAll(pageable).map(pedidoMapper::toDTO);
+    public Page<PedidoDTO> listarTodos(String search, String estado, LocalDate desde, LocalDate hasta, Pageable pageable) {
+        var spec = PedidoSpecification.conFiltros(search, estado, desde, hasta);
+        return pedidoRepository.findAll(spec, pageable).map(pedidoMapper::toDTO);
     }
 
     public PedidoDTO cambiarEstado(Long pedidoId, ActualizarEstadoPedidoDTO request) {
@@ -37,6 +41,10 @@ public class AdminPedidoService {
                 .orElseThrow(() -> new RecursoNoEncontradoException("Pedido", pedidoId));
 
         EstadoPedido nuevoEstado = EstadoPedido.valueOf(request.estado().toUpperCase());
+
+        if (pedido.getEstado() == EstadoPedido.PAGADO && nuevoEstado == EstadoPedido.CANCELADO) {
+            throw new IllegalArgumentException("No se puede cancelar un pedido ya pagado");
+        }
 
         if (nuevoEstado == EstadoPedido.CANCELADO && pedido.getEstado() == EstadoPedido.PENDIENTE) {
             for (ItemPedido item : pedido.getItems()) {

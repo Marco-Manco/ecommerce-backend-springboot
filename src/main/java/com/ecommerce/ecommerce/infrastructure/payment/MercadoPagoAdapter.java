@@ -8,7 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,11 +18,14 @@ public class MercadoPagoAdapter implements PagoPort {
 
     private final RestClient restClient;
     private final String accessToken;
+    private final String baseUrl;
 
     public MercadoPagoAdapter(RestClient.Builder builder,
-                              @Value("${mercado-pago.access-token}") String accessToken) {
+                              @Value("${mercado-pago.access-token}") String accessToken,
+                              @Value("${app.base-url:http://localhost:5173}") String baseUrl) {
         this.restClient = builder.baseUrl("https://api.mercadopago.com").build();
         this.accessToken = accessToken;
+        this.baseUrl = baseUrl;
     }
 
     @Override
@@ -41,6 +43,30 @@ public class MercadoPagoAdapter implements PagoPort {
         return (String) response.get("init_point");
     }
 
+    @Override
+    public boolean verificarPagoAprobado(Long externalReference) {
+        try {
+            Map<String, Object> response = restClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/v1/payments/search")
+                            .queryParam("external_reference", externalReference.toString())
+                            .build())
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve()
+                    .body(Map.class);
+
+            if (response == null) return false;
+
+            var results = (List<Map<String, Object>>) response.get("results");
+            if (results == null || results.isEmpty()) return false;
+
+            return results.stream().anyMatch(p ->
+                    "approved".equals(p.get("status")));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private Map<String, Object> buildPreference(Pedido pedido) {
         List<Map<String, Object>> items = new ArrayList<>();
         for (ItemPedido item : pedido.getItems()) {
@@ -53,16 +79,18 @@ public class MercadoPagoAdapter implements PagoPort {
             items.add(mpItem);
         }
 
+        String confirmUrl = baseUrl + "/api/pagos/confirmar?pedidoId=" + pedido.getId();
+
         Map<String, Object> backUrls = new HashMap<>();
-        String baseUrl = "http://localhost:8080/api/pagos/confirmar?pedidoId=" + pedido.getId();
-        backUrls.put("success", baseUrl);
-        backUrls.put("failure", baseUrl);
-        backUrls.put("pending", baseUrl);
+        backUrls.put("success", confirmUrl);
+        backUrls.put("failure", confirmUrl);
+        backUrls.put("pending", confirmUrl);
 
         Map<String, Object> preference = new HashMap<>();
         preference.put("items", items);
         preference.put("external_reference", pedido.getId().toString());
         preference.put("back_urls", backUrls);
+        preference.put("auto_return", "approved");
 
         return preference;
     }

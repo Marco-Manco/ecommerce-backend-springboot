@@ -2,7 +2,6 @@ package com.ecommerce.ecommerce.infrastructure.security;
 
 import com.ecommerce.ecommerce.application.dto.AuthResponse;
 import com.ecommerce.ecommerce.application.service.AuthService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
@@ -15,11 +14,9 @@ import java.io.IOException;
 @Component
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final AuthService authService;
-    private final ObjectMapper objectMapper;
 
-    public OAuth2SuccessHandler(AuthService authService, ObjectMapper objectMapper){
+    public OAuth2SuccessHandler(AuthService authService) {
         this.authService = authService;
-        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -35,8 +32,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         AuthResponse authResponse = authService.procesarOAuth2Login(email, nombre, googleId);
 
-        response.setContentType("application/json");
-        response.setStatus(HttpServletResponse.SC_OK);
-        objectMapper.writeValue(response.getWriter(), authResponse);
+        String redirectUrl = String.format(
+            "http://localhost:5173/login?token=%s&email=%s&nombre=%s&rol=%s",
+            authResponse.token(),
+            authResponse.email(),
+            authResponse.nombre(),
+            authResponse.rol()
+        );
+
+        response.sendRedirect(redirectUrl);
     }
 }
