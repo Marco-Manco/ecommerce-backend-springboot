@@ -4,6 +4,7 @@ import com.ecommerce.ecommerce.application.port.out.PagoPort;
 import com.ecommerce.ecommerce.application.service.PedidoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +18,13 @@ public class PagoController {
 
     private final PedidoService pedidoService;
     private final PagoPort pagoPort;
+    private final String frontendUrl;
 
-    public PagoController(PedidoService pedidoService, PagoPort pagoPort) {
+    public PagoController(PedidoService pedidoService, PagoPort pagoPort,
+                          @Value("${app.frontend-url:http://localhost:5173}") String frontendUrl) {
         this.pedidoService = pedidoService;
         this.pagoPort = pagoPort;
+        this.frontendUrl = frontendUrl;
     }
 
     @GetMapping("/api/pagos/confirmar")
@@ -33,7 +37,7 @@ public class PagoController {
         }
 
         return ResponseEntity.status(HttpStatus.FOUND)
-                .header(HttpHeaders.LOCATION, "http://localhost:5173/pedidos")
+                .header(HttpHeaders.LOCATION, frontendUrl + "/pedidos")
                 .build();
     }
 
