@@ -45,3 +45,8 @@ cloudinary:
 logging:
   level:
     root: INFO
+
+management:
+  health:
+    rabbit:
+      enabled: false
