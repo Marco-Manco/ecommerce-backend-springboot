@@ -23,6 +23,7 @@ public interface ProductoMapper {
 
     List<VarianteDTO> variantesToDTO(List<VarianteProducto> variantes);
 
+    @Mapping(target = "url", expression = "java(optimizarUrl(imagen.getUrl(), \"w_800,h_800,c_fit\"))")
     ImagenDTO imagenToDTO(ImagenProducto imagen);
 
     List<ImagenDTO> imagenesToDTO(Set<ImagenProducto> imagenes);
@@ -67,6 +68,12 @@ public interface ProductoMapper {
                 .filter(i -> i.getOrden() != null)
                 .min(Comparator.comparing(ImagenProducto::getOrden))
                 .map(ImagenProducto::getUrl)
+                .map(url -> optimizarUrl(url, "w_400,h_400,c_fill,g_auto"))
                 .orElse(null);
+    }
+
+    default String optimizarUrl(String url, String transformacion) {
+        if (url == null || !url.contains("cloudinary")) return url;
+        return url.replaceFirst("/upload/", "/upload/" + transformacion + "/");
     }
 }
