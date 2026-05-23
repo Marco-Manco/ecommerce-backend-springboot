@@ -68,7 +68,7 @@ public interface ProductoMapper {
                 .filter(i -> i.getOrden() != null)
                 .min(Comparator.comparing(ImagenProducto::getOrden))
                 .map(ImagenProducto::getUrl)
-                .map(url -> optimizarUrl(url, "w_400,h_400,c_fill,g_auto"))
+                .map(url -> optimizarUrl(url, "w_400,h_400,c_fit"))
                 .orElse(null);
     }
 
