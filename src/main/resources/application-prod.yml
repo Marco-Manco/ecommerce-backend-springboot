@@ -33,6 +33,7 @@ app:
     secret: ${JWT_SECRET}
     expiration-ms: ${JWT_EXPIRATION_MS:3600000}
   base-url: ${APP_BASE_URL}
+  frontend-url: ${FRONTEND_URL}
 
 mercado-pago:
   access-token: ${MP_ACCESS_TOKEN}

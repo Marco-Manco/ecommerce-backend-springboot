@@ -55,7 +55,8 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
             "http://localhost:5173",
-            "https://ecommerce-tejidos.vercel.app"
+            "https://ecommerce-tejidos.vercel.app",
+            "https://eccomerce-frontend-react.vercel.app"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
