@@ -180,5 +180,28 @@ Categoria 1──N Categoria (autoreferencia jerárquica)
 - [ ] RabbitMQ: eventos de dominio (PedidoCreadoEvent, PedidoPagadoEvent, StockBajoEvent)
 - [ ] Emails transaccionales (pedido creado, pagado, enviado)
 - [ ] Testing con Testcontainers (PostgreSQL + RabbitMQ reales)
-- [ ] Deploy en Render/Railway + Neon.tech
-- [ ] CORS para producción
+- [ ] Integración WhatsApp Cloud API para gestión de pedidos
+
+## 🌐 Demo en vivo
+
+| Recurso | URL |
+|----------|-----|
+| **Frontend** | [eccomerce-frontend-react.vercel.app](https://eccomerce-frontend-react.vercel.app) |
+| **API Swagger** | [ecommerce-backend-springboot-sb48.onrender.com/swagger-ui.html](https://ecommerce-backend-springboot-sb48.onrender.com/swagger-ui.html) |
+
+## 🔑 Credenciales de prueba
+
+| Rol | Email | Contraseña |
+|-----|-------|------------|
+| **Admin** | `admin@ecommerce.com` | `admin1234` |
+
+## 💰 Probar pagos (MercadoPago Sandbox)
+
+1. Agregá productos al carrito y hacé checkout
+2. En la pantalla de MercadoPago, logueate con el usuario de prueba (sandbox):
+   - **Usuario:** `TESTUSER3477234149032093924`
+   - **Contraseña:** `NUD38I13vV`
+3. Pagá con cualquier medio de pago disponible en el sandbox (no se mueve dinero real)
+4. Después del pago serás redirigido automáticamente a la app
+
+> ⚠️ Estamos en **sandbox de MercadoPago**. No se realizan cobros reales.
